@@ -179,7 +179,9 @@ class App extends Component {
           </div> :
           <button
             onClick={() => {
-              window.location = 'https://spot-playlists-backend.herokuapp.com/login';
+              window.location = window.location.includes('localhost')
+                ? 'http://localhost:8888/login'
+                : 'https:  //spot-playlists-backend.herokuapp.com/login';
             }}
             style={{
             padding: '10px',
