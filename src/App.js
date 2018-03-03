@@ -115,51 +115,41 @@ class App extends Component {
     //   this.setState({ serverData: fakeServerData });
     // },1000);
 
-    if (accessToken) {
-      fetch('https://api.spotify.com/v1/me', {
-        headers: {
-          'Authorization': 'Bearer ' + accessToken
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        this.setState({
-          user: {
-            name: data.id
-          }
-        });
-      })
-
-      fetch('https://api.spotify.com/v1/me/playlists', {
-        headers: {
-          'Authorization': 'Bearer ' + accessToken
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        console.warn(data);
-        this.setState({
-          playlists: data.items.map(item => ({
-            name: item.name,
-            songs: [],
-            imageUrl: item.images[0].url
-          }))
-        })
-        // this.setState({
-        //   serverData: {
-        //     user: {
-        //       playlists: []
-        //       // playlists: data.items.map(item => ({
-        //       //   name: item.name,
-        //       //   songs: []
-        //       // }))
-        //     }
-        //   }
-        // })
-      })
-
+    if (!accessToken) {
+      return;
     }
+
+    fetch('https://api.spotify.com/v1/me', {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+      this.setState({
+        user: {
+          name: data.id
+        }
+      });
+    })
+
+    fetch('https://api.spotify.com/v1/me/playlists', {
+      headers: {
+        'Authorization': 'Bearer ' + accessToken
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.warn(data);
+      this.setState({
+        playlists: data.items.map(item => ({
+          name: item.name,
+          songs: [],
+          imageUrl: item.images[0].url
+        }))
+      })
+    })
   }
 
   render() {
@@ -189,7 +179,7 @@ class App extends Component {
           </div> :
           <button
             onClick={() => {
-              window.location = 'http://localhost:8888/login';
+              window.location = 'https://spot-playlists-backend.herokuapp.com/login';
             }}
             style={{
             padding: '10px',
