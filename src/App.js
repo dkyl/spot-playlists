@@ -140,20 +140,46 @@ class App extends Component {
       }
     })
     .then(res => res.json())
-    .then(data => {
-      console.warn(data);
-      this.setState({
-        playlists: data.items.map(item => ({
-          name: item.name,
-          songs: [],
-          imageUrl: item.images[0].url
-        }))
-      })
+    .then(playlistData => {
+
+      let playlists = playlistData.items;
+      // console.warn(playlists);
+      // Array of promises of tracks
+      let trackDataPromises = playlistData.items.map(playlist =>
+        fetch(playlist.tracks.href, {
+          headers: { 'Authorization': 'Bearer ' + accessToken }
+        }).then(response => response.json() ))
+
+      console.warn(trackDataPromises);
+
+      // When all the promises have been resolved
+      return Promise.all(trackDataPromises).then(trackDatas => {
+          // console.log(trackDatas);
+
+          trackDatas.forEach((trackData, index) => {
+            playlists[index].trackDatas = trackData.items
+              .map(item => item.track)
+              .map(trackData => ({
+                name: trackData.name,
+                duration: trackData.duration_ms / 1000
+              }))
+          })
+          return playlists;
+        })
     })
+    .then(playlists => this.setState({
+      playlists: playlists.map(item => {
+        console.log(item.trackDatas);
+        return {
+          name: item.name,
+          imageUrl: item.images[0].url,
+          songs: item.trackDatas.slice(0,3)
+          }
+        })
+    }))
   }
 
   render() {
-    console.warn(this.state);
     let playlistsToRender =
       this.state.user &&
       this.state.playlists
