@@ -126,7 +126,6 @@ class App extends Component {
     })
     .then(res => res.json())
     .then(data => {
-      console.log(data);
       this.setState({
         user: {
           name: data.id
@@ -150,7 +149,7 @@ class App extends Component {
           headers: { 'Authorization': 'Bearer ' + accessToken }
         }).then(response => response.json() ))
 
-      console.warn(trackDataPromises);
+      // console.warn(trackDataPromises);
 
       // When all the promises have been resolved
       return Promise.all(trackDataPromises).then(trackDatas => {
@@ -169,7 +168,7 @@ class App extends Component {
     })
     .then(playlists => this.setState({
       playlists: playlists.map(item => {
-        console.log(item.trackDatas);
+        // console.log(item.trackDatas);
         return {
           name: item.name,
           imageUrl: item.images[0].url,
@@ -180,12 +179,20 @@ class App extends Component {
   }
 
   render() {
+    // console.warn(this.state);
+
     let playlistsToRender =
       this.state.user &&
       this.state.playlists
-        ? this.state.playlists.filter(playlist =>
-          playlist.name.toLowerCase().includes(
-            this.state.filterString.toLowerCase()))
+        ? this.state.playlists.filter(playlist => {
+          let matchesPlaylist = playlist.name.toLowerCase().includes(
+            this.state.filterString.toLowerCase());
+
+          let matchesSong = playlist.songs.find(song => song.name.toLowerCase().includes(
+            this.state.filterString.toLowerCase()));
+
+          return matchesPlaylist || matchesSong;
+        })
         : [];
 
     return (
